@@ -1,6 +1,7 @@
 const { STRING, INTEGER, TEXT } = require('sequelize')
 const db = require('../config/db')
 const Game = require('./Game')
+const GameIteration = require('./GameIteration')
 
 const Winner = db.define('Winner', {
     image: {
@@ -20,7 +21,7 @@ const Winner = db.define('Winner', {
         type: STRING({ length: 100 })
     },
     info: {
-        allowNull: false,
+        allowNull: true,
         type: TEXT
     },
     month: {
@@ -36,12 +37,8 @@ const Winner = db.define('Winner', {
         type: STRING
     },
     index: {
-        allowNull: false,
+        allowNull: true,
         type: INTEGER
-    },
-    region: {
-        allowNull: false,
-        type: STRING
     },
     iteration_id: {
         allowNull: true,
@@ -57,5 +54,7 @@ Winner.sync({ alter: false })
 
 Game.hasMany(Winner, { foreignKey: 'game_id' })
 Winner.belongsTo(Game, { foreignKey: 'game_id' })
+
+GameIteration.hasOne(Winner, { foreignKey: 'iteration_id' })
 
 module.exports = Winner

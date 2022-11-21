@@ -37,6 +37,7 @@ module.exports = () => {
     routes.post('/games', GameValidator.store, GameController.store)
     routes.put('/games', GameValidator.update, GameController.update)
     routes.delete('/games', GameValidator.destroy, GameController.destroy)
+    routes.post('/games/alternate', GameController.alternateStore)
 
     routes.get('/games/enabled', GameController.enabledIndex)
     routes.post('/games/enabled', GameValidator.enabledStore, GameController.enabledStore)
@@ -47,12 +48,15 @@ module.exports = () => {
     routes.get('/userGame/user/:id', UserGameController.user)
     routes.get('/userGame/merchant/:id', UserGameController.merchant)
 
-    routes.get('/gameNumbers/:id', GameNumberController.index)
-    routes.post('/gameNumbers/:id', GameNumberController.show)
+    routes.get('/iterations/:game_id', GameController.iterations)
+    routes.post('/iterations', GameController.addWinningNumber)
+
+    // routes.get('/gameNumbers/:id', GameNumberController.index)
+    // routes.post('/gameNumbers/:id', GameNumberController.show)
 
     routes.put('/winnerAnnouncement', WinnerAnnoucementValidator.update, WinnerAnnoucementController.update)
     routes.delete('/winnerAnnouncement', WinnerAnnoucementValidator.destroy, WinnerAnnoucementController.destroy)
-    routes.post('/findWinner/:iteration',WinnerAnnoucementController.checkWinner)
+    routes.post('/findWinner/:iteration', WinnerAnnoucementController.checkWinner)
 
     return routes
 }

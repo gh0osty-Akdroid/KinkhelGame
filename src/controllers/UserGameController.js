@@ -1,6 +1,7 @@
 const AlternateGame = require('../models/AlternateGame')
 const Category = require('../models/Category')
 const Game = require('../models/Game')
+const GameIteration = require('../models/GameIteration')
 const UserGame = require('../models/UserGame')
 const responses = require('../utils/responses')
 

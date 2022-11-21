@@ -12,7 +12,12 @@ const path = require('path');
 const adminApi = require('./src/routes/admin')
 const userApi = require('./src/routes/user')
 
-app.use(helmet())
+app.use(
+    helmet({
+        crossOriginEmbedderPolicy: false,
+        // crossOriginResourcePolicy: { policy: 'cross-origin' }
+    })
+)
 app.use(cors())
 app.use(express.urlencoded({ limit: '1mb', extended: true }));
 app.use(methodOverride('_method'))

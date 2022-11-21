@@ -10,6 +10,10 @@ const GameIteration = db.define('GameIteration',{
             model: 'games',
             key: 'id'
         }
+    },
+    winning_number:{
+        allowNull: true,
+        type: STRING
     }
 }, {
     tableName: 'game_iterations'

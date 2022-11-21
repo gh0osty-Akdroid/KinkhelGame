@@ -4,6 +4,7 @@ const helper = require('../../utils/helper');
 const Category = require("../../models/Category");
 const Game = require("../../models/Game");
 const EnabledGame = require("../../models/EnabledGame");
+const isBase64 = require('is-base64')
 
 exports.store = [
     check('name').notEmpty().withMessage('The Name of The Game Cannot Be Empty').bail(),
@@ -57,6 +58,31 @@ exports.store = [
     (req, res, next) => helper.validationError(req, res, next)
 ]
 
+exports.alternateStore = [
+    check('name').notEmpty().withMessage('The Name of The Game Cannot Be Empty.').bail(),
+    check('category').notEmpty().withMessage('The Category Cannot Be Empty').bail()
+        .custom(async (val, { req }) => {
+            const check = await Category.findOne({ where: { uId: val } })
+            if (!check) return Promise.reject()
+            req.body.category_id = check.id
+            req.body.id = helper.createId()
+        }).withMessage('The Category With This Identification Cannot Be Found.').bail(),
+    check('prize').notEmpty().withMessage('The Prize of The Game Cannot Be Empty').bail(),
+    check('description').notEmpty().withMessage('The Prize of The Game Cannot Be Empty').bail(),
+    check('charge').isNumeric().withMessage('Please Enter A Valid Charge For This Game.').bail(),
+    check('required_participants').isNumeric().withMessage('Please Enter A Valid Charge For This Game.').bail(),
+    check('images').notEmpty().withMessage('Please Enter Game Images').bail()
+        .custom(async val => {
+            val.forEach(async image => {
+                if (await !isBase64(image)) {
+                    return Promise.reject()
+                }
+            });
+        }).withMessage('Please Enter Valid Images').bail(),
+
+    (req, res, next) => helper.validationError(req, res, next)
+]
+
 exports.update = [
     check('name').notEmpty().withMessage('The Name of The Game Cannot Be Empty').bail(),
     check('prize').notEmpty().withMessage('The Prize of The Game Cannot Be Empty').bail(),
@@ -101,9 +127,12 @@ exports.enabledDestroy = [
     check('game_id').isNumeric().withMessage('Please Enter A Valid Identification.').bail()
         .custom(async (val, { req }) => {
             const check = await EnabledGame.findOne({ where: { game_id: val } })
+            console.log('====================================');
+            console.log(check)
+            console.log('====================================');
             if (!check) return Promise.reject()
             req.body.EnabledGame = check
-        }).withMessage('No Enabeled Game With This Identification Can Be Found').bail(),
+        }).withMessage('No Disabled Game With This Identification Can Be Found').bail(),
 
     (req, res, next) => helper.validationError(req, res, next)
 

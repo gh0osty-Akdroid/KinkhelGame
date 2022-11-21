@@ -28,7 +28,7 @@ exports.store = [
             }
 
             // Check if iteration id is last. If last and is more than one than show error
-            
+
         }).withMessage('You Have Already Played This Game').bail(),
     check('iteration_id').notEmpty().withMessage('Please Enter An Iteration Id For The Game.').bail(),
     check('merchant_id').optional({ checkFalsy: true }).isNumeric().withMessage('Please Enter A Valid Merchant Id').bail(),

@@ -20,7 +20,9 @@ exports.merchant = (req, res) => {
 }
 
 const findUserGames = async (where, res) => {
-    await UserGame.findAll({
+    await UserGame.findAndCountAll({
+        limit: 20,
+        offset: 20 * req.query.page,
         where: where,
         attributes: ['merchant_id', 'chosen_number', 'user_id', 'game_id'],
         order: [['createdAt', 'DESC']],
@@ -31,3 +33,5 @@ const findUserGames = async (where, res) => {
         }
     }).then(v => responses.dataSuccess(res, v)).catch(err => responses.serverError(res, err))
 }
+
+// TODO:: GAME ITERATION IN FIND USER GAMES

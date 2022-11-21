@@ -7,12 +7,14 @@ const responses = require('../../utils/responses')
 const fileHandler = require('../../utils/fileHandler')
 const helper = require('../../utils/helper')
 const GameIteration = require("../../models/GameIteration")
+const Winner = require("../../models/Winner")
+const { where } = require("sequelize")
 
 exports.index = async (req, res) => {
     await Game.findAndCountAll({
         attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'active', 'same_time'],
         include: [
-            { model: Category, attributes: ['uId', 'name'], order: [['createdAt', 'DESC']] },
+            { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },
             { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] },
             { model: EnabledGame, attributes: ['createdAt'] }
         ]
@@ -76,16 +78,24 @@ const disableGame = async (startTime, endTime, gameId) => {
 }
 
 exports.update = async (req, res) => {
-    responses.blankSuccess()
+    await Game.findByPk(req.body.game_id).then(async v => {
+        if (!v) {
+            return responses.notFoundError('The Game With This Identification Cannot Be Found')
+        }
+        else {
+            await v.update(req.body).catch(err => responses.serverError(res, err)).then(() => responses.blankSuccess())
+        }
+    }).catch(err => responses.serverError(res, err))
 }
 
 exports.show = async (req, res) => {
     await Game.findOne({
         where: { id: req.params.id },
-        attributes: ['name', 'id', 'prize', 'active', 'charge', 'winning_numbers', 'same_time', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image'],
+        attributes: ['name', 'id', 'prize', 'active', 'charge', 'winning_numbers', 'same_time', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image', 'winner_announcement'],
         include: [
-            { model: Category, attributes: ['uId', 'name'] },
+            { model: Category, attributes: ['uId', 'name', 'image'] },
             { model: EnabledGame, attributes: ['createdAt'] },
+            { model: GameIteration, attributes: ['id'], limit: 1, order: [['createdAt', 'DESC']], include: { model: Winner } },
             { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] }
         ]
     })
@@ -93,10 +103,21 @@ exports.show = async (req, res) => {
         .catch(err => responses.serverError(res, err))
 }
 
+exports.iterations = async (req, res) => {
+    await GameIteration.findAll({ where: { game_id: req.params.game_id }, include: { model: Winner } }).then(v => {
+        responses.dataSuccess(res, v)
+    }).catch(err => responses.serverError(res, err))
+}
+
 exports.destroy = async (req, res) => {
     let game = new Game()
     game = req.body.Game
-    await game.destroy().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
+    try {
+        await game.destroy().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
+    }
+    catch (err) {
+        responses.serverError(res, "Please Delete The Enabled Game Before Deleting This Game")
+    }
 }
 
 exports.enabledIndex = async (req, res) => {
@@ -105,21 +126,50 @@ exports.enabledIndex = async (req, res) => {
             model: Game,
             attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'active', 'same_time'],
             include: [
-                { model: Category, attributes: ['uId', 'name'], order: [['createdAt', 'DESC']] },
+                { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },
                 { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] }
             ]
         },
-        attributes: ['createdAt']
+        attributes: ['createdAt', 'id']
     }).then(v => responses.dataSuccess(res, v)).catch(err => responses.serverError(res, err))
 }
 
 exports.enabledStore = async (req, res) => {
     const enabledGame = EnabledGame.build(req.body)
-    await enabledGame.save().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
+    const iteration = new GameIteration()
+    iteration.game_id = req.body.game_id
+    iteration.id = helper.createId()
+    await iteration.save().then(async () => {
+        await enabledGame.save().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
+    }).catch(err => responses.serverError(res, err))
 }
 
 exports.enabledDestroy = async (req, res) => {
     let enabledGame = new EnabledGame()
     enabledGame = req.body.EnabledGame
     await enabledGame.destroy().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
+}
+
+exports.addWinningNumber = async (req, res) => {
+    await GameIteration.findOne({ where: { id: req.body.iteration_id } }).then(async v => {
+        if (v) {
+            v.winning_number = req.body.winning_number
+            await v.save().then(() => {
+                responses.blankSuccess(res)
+            }).catch(err => {
+
+                responses.serverError(res, err)
+            })
+        }
+        else responses.notFoundError(res, 'The Iteration With This Id Cannot Be Found.')
+
+    }).catch(err => responses.serverError(res, err))
+}
+
+exports.alternateStore = async(req,res) => {
+    const body = req.body
+    const game = new Game()
+
+    game.id = helper.createId()
+    game.name = body.name
 }

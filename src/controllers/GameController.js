@@ -30,10 +30,11 @@ exports.index = async (req, res) => {
 exports.show = async (req, res) => {
     await Game.findOne({
         where: { id: req.params.id },
-        attributes: ['name', 'id', 'prize', 'active', 'extra', 'allowed_numbers', 'charge', 'total_numbers', 'same_time', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image'],
+        attributes: ['name', 'id', 'prize', 'active', 'winner_announcement', 'extra', 'allowed_numbers', 'charge', 'total_numbers', 'same_time', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image'],
         include: [
             { model: Category, attributes: ['uId', 'name', 'image'] },
             { model: EnabledGame, attributes: ['createdAt'] },
+            { model: GameIteration, attributes: ['id'], limit: 1, order: [['createdAt', 'DESC']] },
             { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] }
         ]
     }).then(v => v && v.EnabledGame ? responses.dataSuccess(res, v) : responses.notFoundError(res, 'The Game With This Identification Cannot Be Found.'))

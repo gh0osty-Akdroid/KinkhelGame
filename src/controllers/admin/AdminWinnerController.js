@@ -13,6 +13,7 @@ exports.index = async (req, res) => {
 
 exports.store = async (req, res) => {
     const winner = Winner.build(req.body)
+    winner.game_id = req.body.Game.id
     winner.image = await fileHandler.addImage(req.body.image)
     await winner.save().then(() => blankSuccess(res)).catch(err => serverError(res, err))
 }
