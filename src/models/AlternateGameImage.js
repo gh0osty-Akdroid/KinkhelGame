@@ -20,6 +20,6 @@ const AlternateGameImage = db.define('AlternateGameImage', {
 AlternateGame.hasMany(AlternateGameImage, { foreignKey: 'alternate_game_id' })
 AlternateGameImage.belongsTo(AlternateGame, { foreignKey: 'alternate_game_id' })
 
-AlternateGame.sync({ alter: true })
+AlternateGameImage.sync({ alter: false })
 
-module.exports = AlternateGame
+module.exports = AlternateGameImage

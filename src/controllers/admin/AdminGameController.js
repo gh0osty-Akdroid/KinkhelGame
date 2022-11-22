@@ -2,6 +2,7 @@ const e = require("cors")
 const AlternateGame = require("../../models/AlternateGame")
 const Category = require("../../models/Category")
 const EnabledGame = require("../../models/EnabledGame")
+const AlternateGameImage = require("../../models/AlternateGameImage")
 const Game = require("../../models/Game")
 const responses = require('../../utils/responses')
 const fileHandler = require('../../utils/fileHandler')
@@ -83,7 +84,9 @@ exports.update = async (req, res) => {
             return responses.notFoundError('The Game With This Identification Cannot Be Found')
         }
         else {
-            await v.update(req.body).catch(err => responses.serverError(res, err)).then(() => responses.blankSuccess())
+            await v.update(req.body).catch(err => responses.serverError(res, err)).then(() => {
+                responses.blankSuccess()
+            })
         }
     }).catch(err => responses.serverError(res, err))
 }
@@ -166,10 +169,24 @@ exports.addWinningNumber = async (req, res) => {
     }).catch(err => responses.serverError(res, err))
 }
 
-exports.alternateStore = async(req,res) => {
+exports.alternateStore = async (req, res) => {
     const body = req.body
-    const game = new Game()
-
-    game.id = helper.createId()
-    game.name = body.name
+    const game = Game.build(body)
+    await game.save().then(async g => {
+        const alternateGame = AlternateGame.build({
+            game_id: g.id,
+            required_participants: body.required_participants,
+        })
+        await alternateGame.save().then(async ag => {
+            body.Images.forEach(async image => {
+                const img = await fileHandler.addImage(image)
+                const agImage = AlternateGameImage.build({
+                    alternate_game_id: ag.id,
+                    image: img
+                })
+                await agImage.save().catch(err => console.log(err))
+                responses.blankSuccess(res)
+            })
+        }).catch(err => responses.serverError(res, err))
+    }).catch(err => responses.serverError(res, err))
 }

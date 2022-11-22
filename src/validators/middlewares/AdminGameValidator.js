@@ -86,7 +86,38 @@ exports.alternateStore = [
 exports.update = [
     check('name').notEmpty().withMessage('The Name of The Game Cannot Be Empty').bail(),
     check('prize').notEmpty().withMessage('The Prize of The Game Cannot Be Empty').bail(),
+    check('category').notEmpty().withMessage('The Category Cannot Be Empty').bail()
+        .custom(async (val, { req }) => {
+            const check = await Category.findOne({ where: { uId: val } })
+            if (!check) return Promise.reject()
+            req.body.category_id = check.id
+            req.body.id = helper.createId()
+        }).withMessage('The Category With This Identification Cannot Be Found.').bail(),
     check('charge').isNumeric().withMessage('The Charge of The Game Cannot Be Empty').bail(),
+    check('opening_time').notEmpty().withMessage('The Opening Date & Time Cannot Be Empty').bail()
+        .custom((val, { req }) => {
+            // Currently Can Be Only Greater Than 24
+            const date = new Date(val)
+            const currentDate = new Date()
+            const ms = date.getTime() - currentDate.getTime()
+            if (ms > 0 && ms < 2147483640) {
+                req.body.startTime = ms
+                return true
+            }
+            else return Promise.reject()
+        }).withMessage('Please Enter A Valid Opening Time').bail(),
+    check('closing_time').notEmpty().withMessage('The Closing Date & Time Cannot Be Empty').bail()
+        .custom((val, { req }) => {
+            const date = new Date(val)
+            const currentDate = new Date()
+            const startTime = req.body.startTime
+            const ms = date.getTime() - currentDate.getTime()
+            if (ms > 0 && ms < 2147483640 * 2 && ms > startTime) {
+                req.body.endTime = ms
+                return true
+            }
+            else return Promise.reject()
+        }).withMessage('Please Enter A Valid Closing Time').bail(),
     check('id').isNumeric().withMessage('Please Enter A Valid Identification.').bail()
         .custom(async (val, { req }) => {
             const check = await Game.findByPk(val)
