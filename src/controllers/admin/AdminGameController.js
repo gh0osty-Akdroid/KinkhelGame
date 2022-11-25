@@ -172,8 +172,12 @@ exports.addWinningNumber = async (req, res) => {
 exports.alternateStore = async (req, res) => {
     const body = req.body
     const game = Game.build(body)
+    game.winning_number = "0,1,2"
+    game.total_numbers = "0-1"
+    game.allowed_numbers = 2
     await game.save().then(async g => {
         const alternateGame = AlternateGame.build({
+            id: helper.createId(),
             game_id: g.id,
             required_participants: body.required_participants,
         })
@@ -181,6 +185,7 @@ exports.alternateStore = async (req, res) => {
             body.Images.forEach(async image => {
                 const img = await fileHandler.addImage(image)
                 const agImage = AlternateGameImage.build({
+                    id: helper.createId(),
                     alternate_game_id: ag.id,
                     image: img
                 })

@@ -37,7 +37,7 @@ module.exports = () => {
     routes.post('/games', GameValidator.store, GameController.store)
     routes.put('/games', GameValidator.update, GameController.update)
     routes.delete('/games', GameValidator.destroy, GameController.destroy)
-    routes.post('/games/alternate', GameController.alternateStore)
+    routes.post('/games/alternate', GameValidator.alternateStore, GameController.alternateStore)
 
     routes.get('/games/enabled', GameController.enabledIndex)
     routes.post('/games/enabled', GameValidator.enabledStore, GameController.enabledStore)
