@@ -9,17 +9,66 @@ const fileHandler = require('../../utils/fileHandler')
 const helper = require('../../utils/helper')
 const GameIteration = require("../../models/GameIteration")
 const Winner = require("../../models/Winner")
-const { where } = require("sequelize")
+const { Op } = require("sequelize")
 
 exports.index = async (req, res) => {
+    let search = req.query.search
+    let site = req.query.site
+    let where = {}
+    if (search) {
+        where.name = { [Op.iLike]: `%${input}%` }
+    }
+    if (site) {
+        where.region = site
+    }
     await Game.findAndCountAll({
         attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'active', 'same_time'],
+        where: where,
         include: [
             { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },
-            { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] },
+            { model: AlternateGame },
             { model: EnabledGame, attributes: ['createdAt'] }
         ]
-    }).then(v => responses.dataSuccess(res, v)).catch(err => responses.serverError(res, err))
+    }).then(v => {
+        const g2 = []
+        v.rows.forEach(game => {
+            if (game.AlternateGame == null) g2.push(game)
+        })
+        v.rows = g2
+        responses.dataSuccess(res, v)
+    }).catch(err => responses.serverError(res, err))
+}
+
+exports.alternateIndex = async (req, res) => {
+    let search = req.query.search
+    let site = req.query.site
+    let where = {}
+    if (search) {
+        where.name = { [Op.iLike]: `%${input}%` }
+    }
+    if (site) {
+        where.region = site
+    }
+    await Game.findAndCountAll({
+        attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'active', 'same_time'],
+        where: where,
+        include: [
+            {
+                model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'], include:
+                {
+                    model: AlternateGameImage, attributes: ['image']
+                }
+            },
+            { model: EnabledGame, attributes: ['createdAt'] }
+        ]
+    }).then(v => {
+        const g2 = []
+        v.rows.forEach(game => {
+            if (game.AlternateGame != null) g2.push(game)
+        })
+        v.rows = g2
+        responses.dataSuccess(res, v)
+    }).catch(err => responses.serverError(res, err))
 }
 
 exports.store = async (req, res) => {
@@ -175,6 +224,8 @@ exports.alternateStore = async (req, res) => {
     game.winning_number = "0,1,2"
     game.total_numbers = "0-1"
     game.allowed_numbers = 2
+    game.opening_time = ""
+    game.closing_time = ""
     await game.save().then(async g => {
         const alternateGame = AlternateGame.build({
             id: helper.createId(),
@@ -182,7 +233,8 @@ exports.alternateStore = async (req, res) => {
             required_participants: body.required_participants,
         })
         await alternateGame.save().then(async ag => {
-            body.Images.forEach(async image => {
+            console.log('AG SAVED');
+            body.images.split('-').forEach(async image => {
                 const img = await fileHandler.addImage(image)
                 const agImage = AlternateGameImage.build({
                     id: helper.createId(),

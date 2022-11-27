@@ -20,9 +20,10 @@ exports.show = async (req, res) => {
         attributes: ['chosen_number', 'merchant_id'],
         include: {
             model: Game,
-            attributes: ['name', 'id', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image'],
+            attributes: ['name', 'id', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image','winner_announcement'],
             include: [
                 { model: Category, attributes: ['uId', 'name'] },
+                { model: GameIteration, attributes: ['id'], limit: 1, order: [['createdAt', 'DESC']] },
                 { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image'] }
             ]
         }

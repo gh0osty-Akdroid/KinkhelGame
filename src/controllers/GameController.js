@@ -1,4 +1,5 @@
 const AlternateGame = require('../models/AlternateGame')
+const AlternateGameImage = require('../models/AlternateGameImage')
 const Category = require('../models/Category')
 const EnabledGame = require('../models/EnabledGame')
 const Game = require('../models/Game')
@@ -10,7 +11,7 @@ exports.index = async (req, res) => {
         attributes: ['*'],
         include: {
             model: Game,
-            attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'extra', 'active', 'same_time'],
+            attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'extra', 'active', 'same_time','winner_announcement'],
             include: [
                 { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },
                 { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] }
@@ -46,10 +47,14 @@ exports.alternateIndex = async (req, res) => {
         attributes: ['*'],
         include: {
             model: Game,
-            attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'active', 'same_time'],
+            attributes: ['name', 'prize', 'charge', 'id'],
             include: [
                 { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },
-                { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] }
+                {
+                    model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'], include: {
+                        model: AlternateGameImage, attributes: ['image']
+                    }
+                }
             ]
         }
     }).then(v => {

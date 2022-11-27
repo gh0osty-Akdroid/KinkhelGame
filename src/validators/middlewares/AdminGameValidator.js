@@ -73,11 +73,11 @@ exports.alternateStore = [
     check('required_participants').isNumeric().withMessage('Please Enter A Valid Charge For This Game.').bail(),
     check('images').notEmpty().withMessage('Please Enter Game Images').bail()
         .custom(async val => {
-            val.forEach(async image => {
+            val.split('-').forEach(async image => {
                 if (await !isBase64(image)) {
                     return Promise.reject()
                 }
-            });
+            })
         }).withMessage('Please Enter Valid Images').bail(),
 
     (req, res, next) => helper.validationError(req, res, next)
