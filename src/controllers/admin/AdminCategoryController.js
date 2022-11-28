@@ -4,14 +4,19 @@ const responses = require('../../utils/responses')
 const fileHandler = require('../../utils/fileHandler')
 
 exports.index = async (req, res) => {
-    await Category.findAll({ attributes: ['uId', 'name', 'image', 'enabled','id'], order: [['createdAt','DESC']] })
+    let site = req.query.site
+    let where = {}
+    if (site) {
+        where.region = site
+    }
+    await Category.findAll({ attributes: ['uId', 'name', 'image', 'enabled', 'id'], order: [['createdAt', 'DESC']], where: where })
         .then(v => responses.dataSuccess(res, v)).catch(err => responses.serverError(res, err))
 }
 
 exports.show = async (req, res) => {
     await Category.findOne({
         where: { uId: req.params.id },
-        attributes: ['uId', 'name', 'image', 'enabled','id']
+        attributes: ['uId', 'name', 'image', 'enabled', 'id']
     })
         .then(v => v ? responses.dataSuccess(res, v) : responses.notFoundError(res, `The Category With Identification ${req.params.id} Cannot Be Found`))
         .catch(err => responses.serverError(res, err))
@@ -38,11 +43,11 @@ exports.update = async (req, res) => {
 exports.destroy = async (req, res) => {
     let cat = new Category()
     cat = req.body.Cat
-    try{
+    try {
         await cat.destroy().then(() => responses.blankSuccess(res))
     }
-    catch(err){
-        responses.serverError(res,"Please Delete The Enabled Games And Games Before Deleting This Category")
+    catch (err) {
+        responses.serverError(res, "Please Delete The Enabled Games And Games Before Deleting This Category")
     }
 }
 

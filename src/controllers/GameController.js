@@ -7,11 +7,17 @@ const GameIteration = require('../models/GameIteration')
 const responses = require('../utils/responses')
 
 exports.index = async (req, res) => {
+    let site = req.query.site
+    let where = {}
+    if (site) {
+        where.region = site
+    }
     await EnabledGame.findAll({
         attributes: ['*'],
         include: {
             model: Game,
-            attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'extra', 'active', 'same_time','winner_announcement'],
+            where: where,
+            attributes: ['name', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'id', 'extra', 'active', 'same_time', 'winner_announcement'],
             include: [
                 { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },
                 { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'] }
@@ -43,10 +49,16 @@ exports.show = async (req, res) => {
 }
 
 exports.alternateIndex = async (req, res) => {
+    let site = req.query.site
+    let where = {}
+    if (site) {
+        where.region = site
+    }
     await EnabledGame.findAll({
         attributes: ['*'],
         include: {
             model: Game,
+            where: where,
             attributes: ['name', 'prize', 'charge', 'id'],
             include: [
                 { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },

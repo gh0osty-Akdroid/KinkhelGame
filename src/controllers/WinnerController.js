@@ -6,6 +6,7 @@ const responses = require('../utils/responses')
 exports.index = async (req, res) => {
     await Winner.findAll({
         attributes: ['image', 'name', 'info', 'index', 'other'],
+        order: [['createdAt', 'DESC']],
         include: {
             model: Game, attributes: ['id'],
             include: { model: Category, attributes: ['name', 'image'] }
@@ -14,22 +15,23 @@ exports.index = async (req, res) => {
         const categories = []
         const allWinners = []
         winners.forEach(winner => {
-            const wins = []
             let catName = winner.Game.Category.name
-            console.log(catName);
             if (!categories.includes(catName)) {
-                console.log(catName)
-                categories.push(catName)
-                wins.push(winner)
-                let win = { categeory: catName, winners: wins }
+                const win = { category: catName, winners: [] }
                 allWinners.push(win)
-            }
-            else{
-                console.log('pok');
+                categories.push(catName)
             }
         })
+        allWinners.forEach(aw => {
+            winners.forEach(winner => {
+                if (winner.Game.Category.name == aw.category) {
+                    let win = aw.winners
+                    win.push(winner)
+                }
+            })
+        })
 
-        responses.dataSuccess(res, winners)
+        responses.dataSuccess(res, allWinners)
     }).catch(err => responses.serverError(res, err))
 }
 
