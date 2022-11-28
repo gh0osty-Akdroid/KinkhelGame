@@ -19,7 +19,7 @@ const GameIteration = db.define('GameIteration',{
     tableName: 'game_iterations'
 })
 
-GameIteration.sync({ alter: false })
+GameIteration.sync({ alter: true })
 
 Game.hasMany(GameIteration, { foreignKey: 'game_id' })
 

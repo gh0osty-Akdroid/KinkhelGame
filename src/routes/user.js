@@ -19,6 +19,7 @@ module.exports = () => {
     routes.get('/play/:user', UserGameController.show)
 
     routes.get('/winners', WinnerController.index)
+    routes.get('/home/winners',WinnerController.homeIndex)
     routes.get('/iteration/:id',GameController.iteration)
 
     return routes

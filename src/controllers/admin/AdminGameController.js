@@ -234,7 +234,7 @@ exports.alternateStore = async (req, res) => {
         })
         await alternateGame.save().then(async ag => {
             console.log('AG SAVED');
-            body.images.split('-').forEach(async image => {
+            body.images.forEach(async image => {
                 const img = await fileHandler.addImage(image)
                 const agImage = AlternateGameImage.build({
                     id: helper.createId(),

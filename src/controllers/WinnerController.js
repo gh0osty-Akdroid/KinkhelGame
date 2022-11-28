@@ -4,12 +4,17 @@ const Winner = require("../models/Winner")
 const responses = require('../utils/responses')
 
 exports.index = async (req, res) => {
+    let site = req.query.site
+    let where = {}
+    if (site) {
+        where.region = site
+    }
     await Winner.findAll({
         attributes: ['image', 'name', 'info', 'index', 'other'],
         order: [['createdAt', 'DESC']],
         include: {
             model: Game, attributes: ['id'],
-            include: { model: Category, attributes: ['name', 'image'] }
+            include: { model: Category, attributes: ['name', 'image'], where: where }
         }
     }).then(winners => {
         const categories = []
@@ -26,7 +31,9 @@ exports.index = async (req, res) => {
             winners.forEach(winner => {
                 if (winner.Game.Category.name == aw.category) {
                     let win = aw.winners
-                    win.push(winner)
+                    if (win.length <= 5) {
+                        win.push(winner)
+                    }
                 }
             })
         })
@@ -35,3 +42,12 @@ exports.index = async (req, res) => {
     }).catch(err => responses.serverError(res, err))
 }
 
+exports.homeIndex = async (req, res) => {
+    await Winner.findAll({
+        attributes: ['image', 'name', 'info', 'index', 'other'],
+        limit: 10,
+        order: [['createdAt', 'DESC']]
+    }).then(winners => {
+        responses.dataSuccess(res, winners)
+    }).catch(err => responses.serverError(res, err))
+}
