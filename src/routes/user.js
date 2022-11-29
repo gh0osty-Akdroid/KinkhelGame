@@ -16,7 +16,7 @@ module.exports = () => {
     routes.get('/game/:id', GameController.show)
 
     routes.post('/play', UserGameValidator.store, UserGameController.store)
-    routes.get('/play/:user', UserGameController.show)
+    routes.get('/play', UserGameController.show)
 
     routes.get('/winners', WinnerController.index)
     routes.get('/home/winners',WinnerController.homeIndex)

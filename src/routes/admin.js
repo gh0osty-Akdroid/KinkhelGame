@@ -46,7 +46,7 @@ module.exports = () => {
 
     routes.get('/play/:game/:user', UserGameController.show)
     routes.get('/userGame/game/:id', UserGameController.game)
-    routes.get('/userGame/user', UserGameController.user)
+    routes.get('/userGame/user/:id', UserGameController.user)
     routes.get('/userGame/merchant/:id', UserGameController.merchant)
 
     routes.get('/iterations/:game_id', GameController.iterations)
