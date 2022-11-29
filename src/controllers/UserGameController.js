@@ -16,8 +16,8 @@ exports.participateStore = async (req, res) => {
 
 exports.show = async (req, res) => {
     const where = {}
-    where.user_id = req.params.user
-    where.merchant_id = req.params.merchant
+    where.user_id = req.query.user
+    where.merchant_id = req.query.merchant
     await UserGame.findAll({
         where: where,
         attributes: ['chosen_number', 'merchant_id'],
