@@ -10,17 +10,20 @@ exports.store = async (req, res) => {
     await userGame.save().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
 }
 
-exports.participateStore = async(req,res)=> {
-    
+exports.participateStore = async (req, res) => {
+
 }
 
 exports.show = async (req, res) => {
+    const where = {}
+    where.user_id = req.params.user
+    where.merchant_id = req.params.merchant
     await UserGame.findAll({
-        where: { user_id: req.params.user },
+        where: where,
         attributes: ['chosen_number', 'merchant_id'],
         include: {
             model: Game,
-            attributes: ['name', 'id', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image','winner_announcement'],
+            attributes: ['name', 'id', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image', 'winner_announcement'],
             include: [
                 { model: Category, attributes: ['uId', 'name'] },
                 { model: GameIteration, attributes: ['id'], limit: 1, order: [['createdAt', 'DESC']] },
