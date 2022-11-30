@@ -4,7 +4,7 @@ const Game = require("../../models/Game")
 const UserGame = require("../../models/UserGame")
 
 exports.game = (req, res) => {
-    findUserGames({ game_id: req.params.id }, res)
+    findUserGames({ game_id: req.params.id, iteration_id: req.query.iteration }, res)
 }
 
 exports.user = (req, res) => {

@@ -11,7 +11,7 @@ exports.store = async (req, res) => {
 }
 
 exports.participateStore = async (req, res) => {
-
+    
 }
 
 exports.show = async (req, res) => {
@@ -24,16 +24,21 @@ exports.show = async (req, res) => {
     }
     await UserGame.findAll({
         where: where,
-        attributes: ['chosen_number', 'merchant_id'],
-        include: {
-            model: Game,
-            attributes: ['name', 'id', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image', 'winner_announcement'],
-            include: [
-                { model: Category, attributes: ['uId', 'name'] },
-                { model: GameIteration, attributes: ['id'], limit: 1, order: [['createdAt', 'DESC']] },
-                { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image'] }
-            ]
-        }
+        attributes: ['chosen_number', 'merchant_id','createdAt'],
+        include: [
+            {
+                model: Game,
+                attributes: ['name', 'id', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image', 'winner_announcement'],
+                include: [
+                    { model: Category, attributes: ['uId', 'name'] },
+                    { model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image'] }
+                ]
+            },
+            {
+                model: GameIteration,
+                attributes: ['id','winning_number']
+            }
+        ]
     }).then(v => v ? responses.dataSuccess(res, v) : responses.notFoundError('No Data Found On Provided Condition'))
         .catch(err => responses.serverError(res, err))
 }
