@@ -42,4 +42,6 @@ Game.hasMany(UserGame, { foreignKey: 'game_id' })
 
 UserGame.belongsTo(Game, { foreignKey: 'game_id' })
 
+UserGame.hasOne(GameIteration, { foreignKey: 'id', sourceKey: 'iteration_id' })
+
 module.exports = UserGame
