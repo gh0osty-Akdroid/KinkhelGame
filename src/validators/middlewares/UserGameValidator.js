@@ -20,7 +20,11 @@ exports.store = [
             if (req.body.user_id) {
                 try {
                     const check = await UserGame.findAll({ where: { user_id: req.body.user_id, game_id: val } })
-                    if (check?.length > 0) return Promise.reject()
+                    let count = 0
+                    await check.forEach(uGame => {
+                        if (uGame.iteration_id == req.body.iteration_id) count = count + 1
+                    })
+                    if (count > 0) return Promise.reject()
                 }
                 catch (err) {
                     console.log(err);
