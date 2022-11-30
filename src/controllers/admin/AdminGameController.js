@@ -242,8 +242,8 @@ exports.alternateStore = async (req, res) => {
                     image: img
                 })
                 await agImage.save().catch(err => console.log(err))
-                responses.blankSuccess(res)
             })
+            responses.blankSuccess(res)
         }).catch(err => responses.serverError(res, err))
     }).catch(err => responses.serverError(res, err))
 }
