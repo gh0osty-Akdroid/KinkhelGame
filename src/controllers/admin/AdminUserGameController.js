@@ -3,6 +3,7 @@ const Category = require("../../models/Category")
 const Game = require("../../models/Game")
 const UserGame = require("../../models/UserGame")
 const GameIteration = require('../../models/GameIteration')
+const AlternateGame = require('../../models/AlternateGame')
 
 exports.show = (req, res) => {
     findUserGames({ user_id: req.params.user, game_id: req.params.game, iteration_id: req.query.iteration }, res, req)
@@ -31,8 +32,11 @@ const findUserGames = async (where, res, req) => {
         include: [{
             model: Game,
             attributes: ['name', 'id', 'prize', 'charge', 'total_numbers', 'opening_time', 'closing_time', 'description', 'notes', 'winning_image'],
-            include: { model: Category, attributes: ['uId', 'name'] }
-        },{
+            include: [
+                { model: Category, attributes: ['uId', 'name'] },
+                { model: AlternateGame, attributes: ['required_participants'] }
+            ]
+        }, {
             model: GameIteration
         }]
     }).then(async v => {
