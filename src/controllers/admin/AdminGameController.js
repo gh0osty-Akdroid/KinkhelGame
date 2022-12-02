@@ -221,19 +221,25 @@ exports.addWinningNumber = async (req, res) => {
 exports.testImages = async (req, res) => {
     const body = req.body
     let ag = await AlternateGame.findOne()
-    if(body.images.length>0){
-        body?.images.forEach(async e => {
-            try {
-                var img = await fileHandler.addImage(e)
-                var image = await AlternateGameImage.build({ alternate_game_id: ag.id, image: img })
-                await image.save().catch(err => responses.serverError(res, err)).then(v => responses.blankSuccess(res))
-            }
-            catch (err) {
-                responses.serverError(res, err)
-            }
-        })
+    if (body.images?.length > 0) {
+        try {
+            let ar = body.images.replace(/\[|\]/g,'').split(',')
+            ar.forEach(async e => {
+                try {
+                    var img = await fileHandler.addImage(e)
+                    var image = await AlternateGameImage.build({ alternate_game_id: ag.id, image: img })
+                    await image.save().catch(err => responses.serverError(res, err))
+                }
+                catch (err) {
+                    responses.serverError(res, err)
+                }
+            })
+        }
+        catch (err) {
+            responses.serverError(res, err.message)
+        }
     }
-    else responses.serverError(res,'Not a list')
+    else responses.serverError(res, 'Not a list')
 }
 
 exports.alternateStore = async (req, res) => {
@@ -251,7 +257,8 @@ exports.alternateStore = async (req, res) => {
             required_participants: body.required_participants,
         })
         await alternateGame.save().then(async () => {
-            body?.images.forEach(async e => {
+            let ar = body.images.replace(/\[|\]/g,'').split(',')
+            ar.forEach(async e => {
                 var img = await fileHandler.addImage(e)
                 var image = await AlternateGameImage.build({ alternate_game_id: alternateGame.id, image: img })
                 await image.save().catch(err => console.log(err))
