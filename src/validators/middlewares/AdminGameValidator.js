@@ -74,6 +74,7 @@ exports.alternateStore = [
     check('images').notEmpty().withMessage('Please Enter Game Images').bail()
         .custom(async val => {
             val.forEach(async image => {
+                console.log(image)
                 if (await !isBase64(image)) {
                     return Promise.reject()
                 }

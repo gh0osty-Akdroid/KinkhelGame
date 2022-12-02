@@ -1,4 +1,5 @@
 const { check } = require("express-validator")
+const AlternateGame = require("../../models/AlternateGame")
 const EnabledGame = require("../../models/EnabledGame")
 const Game = require("../../models/Game")
 const UserGame = require("../../models/UserGame")
@@ -8,13 +9,16 @@ exports.store = [
     check('user_id').optional({ checkFalsy: true }).isNumeric().withMessage('Please Enter A Valid User Id').bail(),
     check('game_id').isNumeric().withMessage('Please Enter A Valid Identification For Game.').bail()
         .custom(async (val, { req }) => {
-            const check = await Game.findOne({ where: { id: val }, include: { model: EnabledGame } })
+            const check = await Game.findOne({ where: { id: val }, include: [{ model: EnabledGame }, { model: AlternateGame }] })
             if (!check || !check.EnabledGame) return Promise.reject()
+            req.body.id = helper.createId()
             if (check.active) {
-                req.body.id = helper.createId()
                 return true
             }
-            else return Promise.reject()
+            else {
+                if (check.AlternateGame == null) return Promise.reject()
+                else return true
+            }
         }).withMessage('The Game With This Identification Cannot Be Found').bail()
         .custom(async (val, { req }) => {
             if (req.body.user_id) {
