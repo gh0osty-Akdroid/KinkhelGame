@@ -76,12 +76,12 @@ exports.store = async (req, res) => {
     const game = Game.build(body)
     await game.save().then(async (g) => {
         if (req.body.required_participants) {
-            const alternateGame = AlternateGame.build({
-                game_id: g.id,
-                required_participants: body.required_participants,
-            })
-            alternateGame.image = await fileHandler.addImage(req.body.image)
-            await alternateGame.save().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
+            // const alternateGame = AlternateGame.build({
+            //     game_id: g.id,
+            //     required_participants: body.required_participants,
+            // })
+            // alternateGame.image = await fileHandler.addImage(req.body.image)
+            // await alternateGame.save().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
         }
         else {
             enableGame(body.startTime, body.endTime, g.id)
@@ -232,16 +232,11 @@ exports.alternateStore = async (req, res) => {
             game_id: g.id,
             required_participants: body.required_participants,
         })
-        await alternateGame.save().then(async ag => {
-            console.log('AG SAVED');
-            body.images.forEach(async image => {
-                const img = await fileHandler.addImage(image)
-                const agImage = AlternateGameImage.build({
-                    id: helper.createId(),
-                    alternate_game_id: ag.id,
-                    image: img
-                })
-                await agImage.save().catch(err => console.log(err))
+        await alternateGame.save().then(async () => {
+            body?.images.forEach(async e => {
+                var img = await fileHandler.addImage(e)
+                var image = await AlternateGameImage.build({ alternate_game_id: alternateGame.id, image: img })
+                await image.save()
             })
             responses.blankSuccess(res)
         }).catch(err => responses.serverError(res, err))
