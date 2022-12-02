@@ -221,16 +221,19 @@ exports.addWinningNumber = async (req, res) => {
 exports.testImages = async (req, res) => {
     const body = req.body
     let ag = await AlternateGame.findOne()
-    body?.images.forEach(async e => {
-        try {
-            var img = await fileHandler.addImage(e)
-            var image = await AlternateGameImage.build({ alternate_game_id: ag.id, image: img })
-            await image.save().catch(err => responses.serverError(res, err)).then(v => responses.blankSuccess(res))
-        }
-        catch (err) {
-            responses.serverError(res, err)
-        }
-    })
+    if(body.images.length>0){
+        body?.images.forEach(async e => {
+            try {
+                var img = await fileHandler.addImage(e)
+                var image = await AlternateGameImage.build({ alternate_game_id: ag.id, image: img })
+                await image.save().catch(err => responses.serverError(res, err)).then(v => responses.blankSuccess(res))
+            }
+            catch (err) {
+                responses.serverError(res, err)
+            }
+        })
+    }
+    else responses.serverError(res,'Not a list')
 }
 
 exports.alternateStore = async (req, res) => {
