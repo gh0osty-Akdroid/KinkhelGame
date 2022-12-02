@@ -27,8 +27,8 @@ exports.checkWinner = async (req, res) => {
                 if (userGame.chosen_number.includes(req.body.number)) {
                     count++
                 }
-                responses.dataSuccess(res, count)
             })
+            responses.dataSuccess(res, count)
         }
         else responses.dataSuccess(res, count)
 

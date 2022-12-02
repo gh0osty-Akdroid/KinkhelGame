@@ -234,17 +234,8 @@ exports.alternateStore = async (req, res) => {
         })
         await alternateGame.save().then(async () => {
             body?.images.forEach(async e => {
-                console.log('====================================');
-                console.log(e);
-                console.log('====================================');
                 var img = await fileHandler.addImage(e)
-                console.log('====================================');
-                console.log(img);
-                console.log('====================================');
                 var image = await AlternateGameImage.build({ alternate_game_id: alternateGame.id, image: img })
-                console.log('====================================');
-                console.log(image);
-                console.log('====================================');
                 await image.save().catch(err=>console.log(err))
             })
             responses.blankSuccess(res)
