@@ -61,6 +61,7 @@ exports.alternateIndex = async (req, res) => {
             where: where,
             attributes: ['name', 'prize', 'charge', 'id'],
             include: [
+                { model: GameIteration, attributes: ['id'], limit: 1, order: [['createdAt', 'DESC']] },
                 { model: Category, attributes: ['uId', 'name', 'image'], order: [['createdAt', 'DESC']] },
                 {
                     model: AlternateGame, attributes: ['required_participants', 'active_participants', 'image', 'current_participants'], include: {
