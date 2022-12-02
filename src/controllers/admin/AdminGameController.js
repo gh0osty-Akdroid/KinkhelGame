@@ -257,8 +257,7 @@ exports.alternateStore = async (req, res) => {
             required_participants: body.required_participants,
         })
         await alternateGame.save().then(async () => {
-            let ar = body.images.replace(/\[|\]/g,'').split(',')
-            ar.forEach(async e => {
+            body?.images.forEach(async e => {
                 var img = await fileHandler.addImage(e)
                 var image = await AlternateGameImage.build({ alternate_game_id: alternateGame.id, image: img })
                 await image.save().catch(err => console.log(err))
