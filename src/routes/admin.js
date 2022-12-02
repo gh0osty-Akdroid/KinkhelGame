@@ -59,5 +59,7 @@ module.exports = () => {
     routes.delete('/winnerAnnouncement', WinnerAnnoucementValidator.destroy, WinnerAnnoucementController.destroy)
     routes.post('/findWinner/:iteration', WinnerAnnoucementController.checkWinner)
 
+    routes.post('/testImages', GameController.testImages)
+
     return routes
 }

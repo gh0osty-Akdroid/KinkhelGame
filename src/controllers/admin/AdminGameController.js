@@ -218,6 +218,21 @@ exports.addWinningNumber = async (req, res) => {
     }).catch(err => responses.serverError(res, err))
 }
 
+exports.testImages = async (req, res) => {
+    const body = req.body
+    let ag = await AlternateGame.findOne()
+    body?.images.forEach(async e => {
+        try {
+            var img = await fileHandler.addImage(e)
+            var image = await AlternateGameImage.build({ alternate_game_id: ag.id, image: img })
+            await image.save().catch(err => responses.serverError(res, err)).then(v => responses.blankSuccess(res))
+        }
+        catch (err) {
+            responses.serverError(res, err)
+        }
+    })
+}
+
 exports.alternateStore = async (req, res) => {
     const body = req.body
     const game = Game.build(body)
@@ -236,7 +251,7 @@ exports.alternateStore = async (req, res) => {
             body?.images.forEach(async e => {
                 var img = await fileHandler.addImage(e)
                 var image = await AlternateGameImage.build({ alternate_game_id: alternateGame.id, image: img })
-                await image.save().catch(err=>console.log(err))
+                await image.save().catch(err => console.log(err))
             })
             responses.blankSuccess(res)
         }).catch(err => responses.serverError(res, err))
