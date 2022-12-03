@@ -113,13 +113,19 @@ const disableGame = async (startTime, endTime, gameId) => {
         await Game.findByPk(gameId).then(async game => {
             game.active = false
             game.winner_announcement = null
-            await game.save().then(() => {
+            await game.save().then(async () => {
                 if (game.same_time) {
                     const oneDay = 1000 * 60 * 60 * 24
                     const newStart = startTime - endTime + oneDay
                     const newEnd = endTime + oneDay
-                    enableGame(newStart, newEnd, gameId)
-                    // TODO:: Possibly Wrong Logic. Change This Soon
+
+                    // Added Nepal's GMT + 5:45
+                    let date1 = new Date(game.opening_time)
+                    game.opening_time = new Date(date1.getTime() + 86400000 + 345 * 60000)
+                    let date2 = new Date(game.closing_time)
+                    game.closing_time = new Date(date2.getTime() + 86400000 + 345 * 60000)
+
+                    await game.save().catch(err => console.log(err)).then(() => enableGame(newStart, newEnd, gameId))
                 }
                 console.log('Game NOT ACTIVE')
             }).catch(err => console.log(err))
@@ -223,7 +229,7 @@ exports.testImages = async (req, res) => {
     let ag = await AlternateGame.findOne()
     if (body.images?.length > 0) {
         try {
-            let ar = body.images.replace(/\[|\]/g,'').split(',')
+            let ar = body.images.replace(/\[|\]/g, '').split(',')
             ar.forEach(async e => {
                 try {
                     var img = await fileHandler.addImage(e)
