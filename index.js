@@ -19,6 +19,8 @@ app.use(
     })
 )
 
+process.env.TZ = "Asia/Kathmandu"
+
 app.use(cors())
 app.use(express.urlencoded({ limit: '1mb', extended: true }));
 app.use(methodOverride('_method'))
