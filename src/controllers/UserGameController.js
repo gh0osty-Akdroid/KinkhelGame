@@ -7,11 +7,26 @@ const responses = require('../utils/responses')
 
 exports.store = async (req, res) => {
     const userGame = UserGame.build(req.body)
+    if (req.body.isAlternate == true) {
+        await AlternateGame.findOne({ where: { game_id: req.body.thisGameId } }).then(async ag => {
+            ag.active_participants = ag.active_participants + 1
+            await ag.save().then(() => {
+                saveUserGame(userGame)
+            }).catch(err => responses.serverError(res, err))
+        })
+    }
+    else {
+        saveUserGame(userGame)
+    }
+
+}
+
+const saveUserGame = async (userGame) => {
     await userGame.save().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
 }
 
 exports.participateStore = async (req, res) => {
-    
+
 }
 
 exports.show = async (req, res) => {
@@ -24,7 +39,7 @@ exports.show = async (req, res) => {
     }
     await UserGame.findAll({
         where: where,
-        attributes: ['chosen_number', 'merchant_id','createdAt'],
+        attributes: ['chosen_number', 'merchant_id', 'createdAt'],
         include: [
             {
                 model: Game,
@@ -36,7 +51,7 @@ exports.show = async (req, res) => {
             },
             {
                 model: GameIteration,
-                attributes: ['id','winning_number']
+                attributes: ['id', 'winning_number']
             }
         ]
     }).then(v => v ? responses.dataSuccess(res, v) : responses.notFoundError('No Data Found On Provided Condition'))

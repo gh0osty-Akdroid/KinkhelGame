@@ -12,6 +12,9 @@ exports.store = [
             const check = await Game.findOne({ where: { id: val }, include: [{ model: EnabledGame }, { model: AlternateGame }] })
             if (!check || !check.EnabledGame) return Promise.reject()
             req.body.id = helper.createId()
+            if (check.AlternateGame != null) {
+                req.body.isAlternate = true
+            }
             if (check.active) {
                 return true
             }
