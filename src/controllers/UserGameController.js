@@ -11,17 +11,17 @@ exports.store = async (req, res) => {
         await AlternateGame.findOne({ where: { game_id: req.body.thisGameId } }).then(async ag => {
             ag.active_participants = ag.active_participants + 1
             await ag.save().then(() => {
-                saveUserGame(userGame)
+                saveUserGame(res, userGame)
             }).catch(err => responses.serverError(res, err))
         })
     }
     else {
-        saveUserGame(userGame)
+        saveUserGame(res, userGame)
     }
 
 }
 
-const saveUserGame = async (userGame) => {
+const saveUserGame = async (res, userGame) => {
     await userGame.save().then(() => responses.blankSuccess(res)).catch(err => responses.serverError(res, err))
 }
 

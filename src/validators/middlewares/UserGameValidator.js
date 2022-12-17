@@ -6,7 +6,7 @@ const UserGame = require("../../models/UserGame")
 const helper = require('../../utils/helper')
 
 exports.store = [
-    check('user_id').optional({ checkFalsy: true }).isNumeric().withMessage('Please Enter A Valid User Id').bail(),
+    check('user_id').optional({ checkFalsy: true }).notEmpty().withMessage('Please Enter A Valid User Id').bail(),
     check('game_id').isNumeric().withMessage('Please Enter A Valid Identification For Game.').bail()
         .custom(async (val, { req }) => {
             const check = await Game.findOne({ where: { id: val }, include: [{ model: EnabledGame }, { model: AlternateGame }] })
@@ -42,7 +42,7 @@ exports.store = [
 
         }).withMessage('You Have Already Played This Game').bail(),
     check('iteration_id').notEmpty().withMessage('Please Enter An Iteration Id For The Game.').bail(),
-    check('merchant_id').optional({ checkFalsy: true }).isNumeric().withMessage('Please Enter A Valid Merchant Id').bail(),
+    check('merchant_id').optional({ checkFalsy: true }).notEmpty().withMessage('Please Enter A Valid Merchant Id').bail(),
     check('chosen_number').notEmpty().withMessage('Please Enter Chosen Number For The Game').bail()
         .custom(val => {
             const items = val.split('-')
