@@ -15,11 +15,11 @@ const UserGame = db.define('UserGame', {
     },
     user_id: {
         allowNull: true,
-        type: INTEGER
+        type: STRING
     },
     merchant_id: {
         allowNull: true,
-        type: INTEGER
+        type: STRING
     },
     chosen_number: {
         allowNull: false,
