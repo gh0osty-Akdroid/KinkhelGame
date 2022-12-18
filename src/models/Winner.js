@@ -54,7 +54,7 @@ const Winner = db.define('Winner', {
     }
 }, { tableName: 'winners' })
 
-Winner.sync({ alter: false })
+Winner.sync({ alter: true })
 
 Game.hasMany(Winner, { foreignKey: 'game_id' })
 Winner.belongsTo(Game, { foreignKey: 'game_id' })
