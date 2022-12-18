@@ -22,14 +22,17 @@ const Winner = db.define('Winner', {
     },
     info: {
         allowNull: true,
+        defaultValue: "",
         type: TEXT
     },
     month: {
         allowNull: true,
+        defaultValue: "",
         type: STRING
     },
     day: {
         allowNull: true,
+        defaultValue: "",
         type: STRING
     },
     other: {
@@ -38,6 +41,7 @@ const Winner = db.define('Winner', {
     },
     index: {
         allowNull: true,
+        defaultValue 0,
         type: INTEGER
     },
     iteration_id: {
