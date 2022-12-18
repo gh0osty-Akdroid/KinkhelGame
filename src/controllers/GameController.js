@@ -6,6 +6,28 @@ const Game = require('../models/Game')
 const GameIteration = require('../models/GameIteration')
 const responses = require('../utils/responses')
 
+exports.categories = async (req, res) => {
+    let site = req.query.site
+    let where = {}
+    if (site) {
+        where.region = site
+    }
+    await Category.findAll({ attributes: ['uId', 'name', 'image', 'enabled', 'id'], order: [['createdAt', 'DESC']], where: where })
+        .then(v => responses.dataSuccess(res, v)).catch(err => responses.serverError(res, err))
+}
+
+exports.showCategory = async (req, res) => {
+    let site = req.query.site
+    let where = {
+        id: req.params.id
+    }
+    if (site) {
+        where.region = site
+    }
+    await Category.findOne({ where: where, include: { model: Game } }).then(v => responses.dataSuccess(res, v))
+        .catch(err => responses.serverError(res, err))
+}
+
 exports.index = async (req, res) => {
     let site = req.query.site
     let where = {}

@@ -12,6 +12,8 @@ const UserGameValidator = require('../validators/middlewares/UserGameValidator')
 module.exports = () => {
 
     routes.get('/games', GameController.index)
+    routes.get('/categories',GameController.categories)
+    routes.get('/category/:id',GameController.showCategory)
     routes.get('/games/alternate', GameController.alternateIndex)
     routes.get('/game/:id', GameController.show)
 
