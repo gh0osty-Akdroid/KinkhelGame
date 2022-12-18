@@ -8,7 +8,7 @@ const responses = require('../utils/responses')
 exports.store = async (req, res) => {
     const userGame = UserGame.build(req.body)
     if (req.body.isAlternate == true) {
-        await AlternateGame.findOne({ where: { game_id: req.body.thisGameId } }).then(async ag => {
+        await AlternateGame.findOne({ where: { game_id: req.body.game_id } }).then(async ag => {
             ag.active_participants = ag.active_participants + 1
             await ag.save().then(() => {
                 saveUserGame(res, userGame)
