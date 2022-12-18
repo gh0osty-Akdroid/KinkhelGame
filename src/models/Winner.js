@@ -41,7 +41,7 @@ const Winner = db.define('Winner', {
     },
     index: {
         allowNull: true,
-        defaultValue 0,
+        defaultValue: 0,
         type: INTEGER
     },
     iteration_id: {
