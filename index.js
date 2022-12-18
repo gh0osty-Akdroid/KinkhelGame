@@ -12,21 +12,19 @@ const path = require('path');
 const adminApi = require('./src/routes/admin')
 const userApi = require('./src/routes/user')
 
-app.use(
-    helmet({
-        crossOriginEmbedderPolicy: false,
-        // crossOriginResourcePolicy: { policy: 'cross-origin' }
-    })
-)
-
 process.env.TZ = "Asia/Kathmandu"
 
 app.use(cors())
+app.use(
+    helmet({
+        crossOriginEmbedderPolicy: false,
+        crossOriginResourcePolicy: { policy: 'cross-origin' }
+    })
+)
 app.use(express.urlencoded({ limit: '1mb', extended: true }));
 app.use(methodOverride('_method'))
 app.use(express.json({ limit: '1mb' }))
 app.use(express.static(path.join(__dirname, './src/storage')))
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 app.use('/api/v1/admin', adminApi())
 app.use('/api/v1', userApi())
