@@ -24,7 +24,7 @@ exports.showCategory = async (req, res) => {
     if (site) {
         where.region = site
     }
-    await Category.findOne({ where: where, include: { model: Game } }).then(v => responses.dataSuccess(res, v))
+    await Category.findOne({ where: where, include: { model: Game, where: { active: true } } }).then(v => responses.dataSuccess(res, v))
         .catch(err => responses.serverError(res, err))
 }
 
